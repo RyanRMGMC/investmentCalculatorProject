@@ -160,5 +160,5 @@ for (const formElement of $investmentForm) {
     };
 };
 
-$investmentForm.addEventListener('submit', renderProgression);
+// $investmentForm.addEventListener('submit', renderProgression);
 $clearFormButton.addEventListener('click', clearForm);
