@@ -13,17 +13,21 @@ let progressionChartReference = {};
 
 const columnsArray = [
     { columnLabel: 'Mês', accessor: 'month' },
-    { columnLabel: 'Total Investido', accessor: 'investedAmount', format: (numberInfo) => formatCurrency(numberInfo) },
-    { columnLabel: 'Rendimento Mensal', accessor: 'interestReturns', format: (numberInfo) => formatCurrency(numberInfo) },
-    { columnLabel: 'Rendimento Total', accessor: 'totalInterestReturns', format: (numberInfo) => formatCurrency(numberInfo) },
-    { columnLabel: 'Quantia Total', accessor: 'totalAmount', format: (numberInfo) => formatCurrency(numberInfo) }
+    { columnLabel: 'Total Investido', accessor: 'investedAmount', format: (numberInfo) => formatCurrencyToTable(numberInfo) },
+    { columnLabel: 'Rendimento Mensal', accessor: 'interestReturns', format: (numberInfo) => formatCurrencyToTable(numberInfo) },
+    { columnLabel: 'Rendimento Total', accessor: 'totalInterestReturns', format: (numberInfo) => formatCurrencyToTable(numberInfo) },
+    { columnLabel: 'Quantia Total', accessor: 'totalAmount', format: (numberInfo) => formatCurrencyToTable(numberInfo) }
 ];
 
 
 //------------------------------FUNCTIONS------------------------------
 
-function formatCurrency(value) {
+function formatCurrencyToTable(value) {
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+};
+
+function formatCurrencyToChart(value) {
+    return value.toFixed(2);
 };
 
 
@@ -52,60 +56,59 @@ function renderProgression(event) {
         returnRate,
         evaluationPeriod
     );
-    // const finalInvestmentsObject = returnsArray[returnsArray.length - 1];
+    const finalInvestmentsObject = returnsArray[returnsArray.length - 1];
 
-    // doughnutChartReference = new Chart($finalMoneyChart, {
-    //     type: 'doughnut',
-    //     data: {
-    //         labels: [
-    //             'Total Investido',
-    //             'Rendimento',
-    //             'Imposto'
-    //         ],
-    //         datasets: [{
-    //             data: [
-    //                 formatCurrency(finalInvestmentsObject.investedAmount),
-    //                 formatCurrency(finalInvestmentsObject.totalInterestReturns * (1 - taxRate / 100)),
-    //                 formatCurrency(finalInvestmentsObject.totalInterestReturns * (taxRate / 100))
-    //             ],
-    //             backgroundColor: [
-    //                 'rgb(255, 99, 132)',
-    //                 'rgb(54, 162, 235)',
-    //                 'rgb(255, 205, 86)'
-    //             ],
-    //             hoverOffset: 4
-    //         }]
-    //     }
-    // });
+    doughnutChartReference = new Chart($finalMoneyChart, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                'Total Investido',
+                'Rendimento',
+                'Imposto'
+            ],
+            datasets: [{
+                data: [
+                    formatCurrencyToChart(finalInvestmentsObject.investedAmount),
+                    formatCurrencyToChart(finalInvestmentsObject.totalInterestReturns * (1 - taxRate / 100)),
+                    formatCurrencyToChart(finalInvestmentsObject.totalInterestReturns * (taxRate / 100))
+                ],
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)'
+                ],
+                hoverOffset: 4
+            }]
+        }
+    });
 
-    // progressionChartReference = new Chart($progressionChart, {
-    //     type: 'bar',
-    //     data: {
-    //         labels: returnsArray.map(investmentObject => investmentObject.month),
-    //         datasets: [{
-    //             label: 'Total Investido',
-    //             data: returnsArray.map(investmentObject => formatCurrency(investmentObject.investedAmount)),
-    //             backgroundColor: 'rgb(255, 99, 132)'
+    progressionChartReference = new Chart($progressionChart, {
+        type: 'bar',
+        data: {
+            labels: returnsArray.map(investmentObject => investmentObject.month),
+            datasets: [{
+                label: 'Total Investido',
+                data: returnsArray.map(investmentObject => formatCurrencyToChart(investmentObject.investedAmount)),
+                backgroundColor: 'rgb(255, 99, 132)'
 
-    //         }, {
-    //             label: 'Retorno do Investimento',
-    //             data: returnsArray.map(investmentObject => formatCurrency(investmentObject.interestReturns)),
-    //             backgroundColor: 'rgb(54, 162, 235)'
-
-    //         }]
-    //     },
-    //     options: {
-    //         responsive: true,
-    //         scales: {
-    //             x: {
-    //                 stacked: true,
-    //             },
-    //             y: {
-    //                 stacked: true
-    //             }
-    //         }
-    //     }
-    // });
+            }, {
+                label: 'Retorno do Investimento',
+                data: returnsArray.map(investmentObject => formatCurrencyToChart(investmentObject.interestReturns)),
+                backgroundColor: 'rgb(54, 162, 235)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true
+                }
+            }
+        }
+    });
 
     createTable(columnsArray, returnsArray, 'results-table');
 
@@ -170,6 +173,20 @@ for (const formElement of $investmentForm) {
         formElement.addEventListener('blur', validadeInput);
     };
 };
+
+
+const $main = document.querySelector('main');
+const $carousel = document.getElementById('carousel');
+const $nextButton = document.getElementById('slide-arrow-next');
+const $previousButton = document.getElementById('slide-arrow-previous');
+
+$nextButton.addEventListener('click', () => {
+    $carousel.scrollLeft += $main.clientWidth;
+});
+
+$previousButton.addEventListener('click', () => {
+    $carousel.scrollLeft -= $main.clientWidth;
+});
 
 $investmentForm.addEventListener('submit', renderProgression);
 $clearFormButton.addEventListener('click', clearForm);
