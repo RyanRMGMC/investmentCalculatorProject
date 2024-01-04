@@ -1,6 +1,6 @@
 import { generateReturnsArray } from "./src/investmentGoals";
 import { Chart } from "chart.js/auto";
-import { createTable } from "./src/table";
+import { createTable, clearTable } from "./src/table";
 
 const $finalMoneyChart = document.getElementById('final-money-distribution');
 const $progressionChart = document.getElementById('progression');
@@ -39,6 +39,7 @@ function renderProgression(event) {
     };
 
     resetCharts();
+    clearTable('results-table');
 
     const startingAmount = Number(document.getElementById('starting-amount').value.replace(',', '.'));
     const additionalContribution = Number(document.getElementById('additional-contribution').value.replace(',', '.'));
@@ -134,6 +135,7 @@ function clearForm() {
     $investmentForm['tax-rate'].value = '';
 
     resetCharts();
+    clearTable('results-table');
 
     const errorInputs = document.querySelectorAll('.error');
 

@@ -56,19 +56,33 @@ function createTableBody(tableReference, tableItems, columnsArray) {
 
     const tableBodyReference = tableReference.querySelector('tbody') ?? createTbodyElement(tableReference);
 
-    for(const [itemIndex, tableItem] of tableItems.entries()){
+    for (const [itemIndex, tableItem] of tableItems.entries()) {
         const tableRow = document.createElement('tr');
 
-        if(itemIndex % 2 !== 0){
+        if (itemIndex % 2 !== 0) {
             tableRow.classList.add('bg-amber-200');
-        }else{
+        } else {
             tableRow.classList.add('bg-amber-50')
         };
 
-        for(const tableColumn of columnsArray){
+        for (const tableColumn of columnsArray) {
             const formatFunction = tableColumn.format ?? ((info) => info);
             tableRow.innerHTML += /*html*/ `<td class="text-center">${formatFunction(tableItem[tableColumn.accessor])}</td>`;
         };
         tableBodyReference.appendChild(tableRow);
+    };
+};
+
+export function clearTable(tableId) {
+    const table = document.getElementById(tableId);
+
+    const thead = table.querySelector('thead');
+    const tbody = table.querySelector('tbody');
+
+    if (!thead || !tbody) {
+        return;
+    } else {
+        table.removeChild(thead);
+        table.removeChild(tbody);
     };
 };
