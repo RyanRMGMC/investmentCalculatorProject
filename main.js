@@ -1,5 +1,6 @@
 import { generateReturnsArray } from "./src/investmentGoals";
 import { Chart } from "chart.js/auto";
+import { createTable } from "./src/table";
 
 const $finalMoneyChart = document.getElementById('final-money-distribution');
 const $progressionChart = document.getElementById('progression');
@@ -10,11 +11,19 @@ const $clearFormButton = document.getElementById('clear-form');
 let doughnutChartReference = {};
 let progressionChartReference = {};
 
+const columnsArray = [
+    { columnLabel: 'Mês', accessor: 'month' },
+    { columnLabel: 'Total Investido', accessor: 'investedAmount', format: (numberInfo) => formatCurrency(numberInfo) },
+    { columnLabel: 'Rendimento Mensal', accessor: 'interestReturns', format: (numberInfo) => formatCurrency(numberInfo) },
+    { columnLabel: 'Rendimento Total', accessor: 'totalInterestReturns', format: (numberInfo) => formatCurrency(numberInfo) },
+    { columnLabel: 'Quantia Total', accessor: 'totalAmount', format: (numberInfo) => formatCurrency(numberInfo) }
+];
+
 
 //------------------------------FUNCTIONS------------------------------
 
 function formatCurrency(value) {
-    return value.toFixed(2);
+    return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 };
 
 
@@ -26,7 +35,7 @@ function renderProgression(event) {
     };
 
     resetCharts();
-    
+
     const startingAmount = Number(document.getElementById('starting-amount').value.replace(',', '.'));
     const additionalContribution = Number(document.getElementById('additional-contribution').value.replace(',', '.'));
     const timeAmount = Number(document.getElementById('time-amount').value);
@@ -43,69 +52,71 @@ function renderProgression(event) {
         returnRate,
         evaluationPeriod
     );
-    const finalInvestmentsObject = returnsArray[returnsArray.length - 1];
+    // const finalInvestmentsObject = returnsArray[returnsArray.length - 1];
 
-    doughnutChartReference = new Chart($finalMoneyChart, {
-        type: 'doughnut',
-        data: {
-            labels: [
-                'Total Investido',
-                'Rendimento',
-                'Imposto'
-            ],
-            datasets: [{
-                data: [
-                    formatCurrency(finalInvestmentsObject.investedAmount),
-                    formatCurrency(finalInvestmentsObject.totalInterestReturns * (1 - taxRate / 100)),
-                    formatCurrency(finalInvestmentsObject.totalInterestReturns * (taxRate / 100))
-                ],
-                backgroundColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)',
-                    'rgb(255, 205, 86)'
-                ],
-                hoverOffset: 4
-            }]
-        }
-    });
+    // doughnutChartReference = new Chart($finalMoneyChart, {
+    //     type: 'doughnut',
+    //     data: {
+    //         labels: [
+    //             'Total Investido',
+    //             'Rendimento',
+    //             'Imposto'
+    //         ],
+    //         datasets: [{
+    //             data: [
+    //                 formatCurrency(finalInvestmentsObject.investedAmount),
+    //                 formatCurrency(finalInvestmentsObject.totalInterestReturns * (1 - taxRate / 100)),
+    //                 formatCurrency(finalInvestmentsObject.totalInterestReturns * (taxRate / 100))
+    //             ],
+    //             backgroundColor: [
+    //                 'rgb(255, 99, 132)',
+    //                 'rgb(54, 162, 235)',
+    //                 'rgb(255, 205, 86)'
+    //             ],
+    //             hoverOffset: 4
+    //         }]
+    //     }
+    // });
 
-    progressionChartReference = new Chart($progressionChart, {
-        type: 'bar',
-        data: {
-            labels: returnsArray.map(investmentObject => investmentObject.month),
-            datasets: [{
-                label: 'Total Investido',
-                data: returnsArray.map(investmentObject => formatCurrency(investmentObject.investedAmount)),
-                backgroundColor: 'rgb(255, 99, 132)'
+    // progressionChartReference = new Chart($progressionChart, {
+    //     type: 'bar',
+    //     data: {
+    //         labels: returnsArray.map(investmentObject => investmentObject.month),
+    //         datasets: [{
+    //             label: 'Total Investido',
+    //             data: returnsArray.map(investmentObject => formatCurrency(investmentObject.investedAmount)),
+    //             backgroundColor: 'rgb(255, 99, 132)'
 
-            }, {
-                label: 'Retorno do Investimento',
-                data: returnsArray.map(investmentObject => formatCurrency(investmentObject.interestReturns)),
-                backgroundColor: 'rgb(54, 162, 235)'
+    //         }, {
+    //             label: 'Retorno do Investimento',
+    //             data: returnsArray.map(investmentObject => formatCurrency(investmentObject.interestReturns)),
+    //             backgroundColor: 'rgb(54, 162, 235)'
 
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    stacked: true,
-                },
-                y: {
-                    stacked: true
-                }
-            }
-        }
-    })
+    //         }]
+    //     },
+    //     options: {
+    //         responsive: true,
+    //         scales: {
+    //             x: {
+    //                 stacked: true,
+    //             },
+    //             y: {
+    //                 stacked: true
+    //             }
+    //         }
+    //     }
+    // });
+
+    createTable(columnsArray, returnsArray, 'results-table');
 
 };
 
-function isObjectEmpty(obj){
+function isObjectEmpty(obj) {
     return Object.keys(obj).length === 0;
 };
 
-function resetCharts(){
-    if(!isObjectEmpty(doughnutChartReference) && !isObjectEmpty(progressionChartReference)){
+function resetCharts() {
+    if (!isObjectEmpty(doughnutChartReference) && !isObjectEmpty(progressionChartReference)) {
         doughnutChartReference.destroy();
         progressionChartReference.destroy();
 
@@ -160,5 +171,5 @@ for (const formElement of $investmentForm) {
     };
 };
 
-// $investmentForm.addEventListener('submit', renderProgression);
+$investmentForm.addEventListener('submit', renderProgression);
 $clearFormButton.addEventListener('click', clearForm);
