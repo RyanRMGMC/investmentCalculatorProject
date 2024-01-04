@@ -76,8 +76,17 @@
       </div>
     </aside>
 
-    <main class="bg-stone-200 row-span-2 col-span-2">
-      <p>Resultados</p>
+     <main class="h-full">  <!--bg-stone-200 -->
+      <section id="charts-container">
+        <div class="h-[36dvh]">
+          <p>Resultado Final</p>
+          <canvas id="final-money-distribution"></canvas>
+        </div>
+        <div class="h-[56dvh]">
+          <p>Progressão</p>
+          <canvas id="progression"></canvas>
+        </div>
+      </section>
     </main>
 
     <script type="module" src="./main.js"></script>
